@@ -13,14 +13,33 @@ namespace Autorization
 {
     public partial class ChangeDataForm : Form
     {
-        DataTable table;
+        int dR, dG, dB, sign; // переменные для rgb и индекса таймера
+        DataTable table; // глобальная переменная для простоты вывода в Microsoft Word
+        DBclass db = new DBclass(); // переменная класса для БД, и последующей работе с ними
+        private BindingSource bSource = new BindingSource(); // обьявлен для связи с источником соединения
+        Point lastPoint; // специальный класс для задачи координат
+        string id_selected_rows; // переменная для определения целой строки, по нажатию на поле id в dataGrid
+
         public ChangeDataForm()
         {
             InitializeComponent();
         }
-        Point lastPoint; // специальный класс для задачи координат
-        DBclass db = new DBclass();
-        private BindingSource bSource = new BindingSource(); // обьявлен для связи с источником соединения
+        private void ChangeDataForm_Load(object sender, EventArgs e)
+        {
+            ToolTip toolTip1 = new ToolTip(); // тул тип для подсказок
+            toolTip1.AutoPopDelay = 5000; // параметры показа подсказки, в течении какого времени будет видна подсказка
+            toolTip1.InitialDelay = 1000; // в течении какого кол-ва времени после наведения курсора будет показываться подсказка
+            toolTip1.ReshowDelay = 500; // возвращает или задает интервал времени, который должен пройти перед появлением окна очередной всплывающей подсказки при перемещении указателя мыши с одного элемента управления на другой.
+            toolTip1.ShowAlways = true; // статус видимости
+            toolTip1.SetToolTip(label4, "Закрытие программы");
+            ToolTip toolTip2 = new ToolTip(); // тул тип для подсказок
+            toolTip2.AutoPopDelay = 5000; // параметры показа подсказки, в течении какого времени будет видна подсказка
+            toolTip2.InitialDelay = 1000; // в течении какого кол-ва времени после наведения курсора будет показываться подсказка
+            toolTip2.ReshowDelay = 500; // возвращает или задает интервал времени, который должен пройти перед появлением окна очередной всплывающей подсказки при перемещении указателя мыши с одного элемента управления на другой.
+            toolTip2.ShowAlways = true; // статус видимости
+            toolTip2.SetToolTip(label2, "Коды (ID поля) не нужно заполнять, они заполняются автоматически! \n Даты пишутся в формате 2004-12-12\n Первое число - год, Второе - месяц, Третье - день.");
+        }
+
         private void panel5_MouseDown(object sender, MouseEventArgs e)
         {
             lastPoint = new Point(e.X, e.Y); // класс поинт создан для определении позиции в пространстве
@@ -63,6 +82,19 @@ namespace Autorization
         }
 
         private void изПрограммыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult res = new DialogResult();
+            res = MessageBox.Show("Вы действительно хотите выйти?", "Выход из программы", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (res == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                return;
+            }
+        }
+        private void label4_Click(object sender, EventArgs e)
         {
             DialogResult res = new DialogResult();
             res = MessageBox.Show("Вы действительно хотите выйти?", "Выход из программы", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -137,7 +169,6 @@ namespace Autorization
             timer.Tick += timer1_Tick;
             timer.Start();
         }
-        int dR, dG, dB, sign;
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (Math.Abs(labelTheme.ForeColor.R - labelTheme.BackColor.R) < Math.Abs(dR / 10))
@@ -164,6 +195,11 @@ namespace Autorization
                 ((Timer)sender).Stop();
             }
         }
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            string dateandtime = DateTime.Now.ToString();
+            richTextBoxTime.Text = dateandtime;
+        }
         #endregion
         private void EmployeesTableReset()
         {
@@ -182,6 +218,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -189,6 +226,7 @@ namespace Autorization
             textBox5.Visible = true;
             textBox6.Visible = true;
             textBox7.Visible = true;
+
             Column1Label.Visible = false;
             Column2Label.Visible = true;
             Column3Label.Visible = true;
@@ -196,18 +234,21 @@ namespace Autorization
             Column5Label.Visible = true;
             Column6Label.Visible = true;
             Column7Label.Visible = true;
+
             AddLineButton.Visible = true;
             AddLineButton2.Visible = false;
             AddLineButton3.Visible = false;
             AddLineButton4.Visible = false;
             AddLineButton5.Visible = false;
             AddLineButton6.Visible = false;
+
             ResetButton.Visible = true;
             ResetButton2.Visible = false;
             ResetButton3.Visible = false;
             ResetButton4.Visible = false;
             ResetButton5.Visible = false;
             ResetButton6.Visible = false;
+
             DeleteLineButton.Visible = true;
             DeleteLineButton2.Visible = false;
             DeleteLineButton3.Visible = false;
@@ -232,6 +273,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -267,18 +309,33 @@ namespace Autorization
         }
         private void SupplemenEmloyee()
         {
-
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"INSERT INTO Employees(employeesBirthday, employeesDateOfEmployed, employeesName, employeesSurname, employeesPatronymic, employeesJobTitle ) VALUES( \"{textBox2.Text}\", \"{textBox3.Text}\",'{textBox4.Text}','{textBox5.Text}','{textBox6.Text}','{textBox7.Text}')", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO Employees(employeesBirthday, employeesDateOfEmployed, employeesName, employeesSurname, employeesPatronymic, employeesJobTitle ) VALUES( \"{textBox2.Text}\", \"{textBox3.Text}\",'{textBox4.Text}','{textBox5.Text}','{textBox6.Text}','{textBox7.Text}')", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не добавились!","Ошибка ввода!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                db.closeConnection();
+            }
         }
         private void DeleteTable()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"DELETE FROM Employees WHERE EmployeesID = {id_selected_rows}", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"DELETE FROM Employees WHERE EmployeesID = {id_selected_rows}", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не удалены!","Строка не выбрана!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                db.closeConnection();
+            }
         }
         private void CustomerTableReset()
         {
@@ -296,6 +353,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -349,6 +407,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -384,17 +443,33 @@ namespace Autorization
         }
         private void SupplemenEmloyee2()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"INSERT INTO Customer(customerCompanyName, customerAddress, PSRN, ITN) VALUES( '{textBox2.Text}', '{textBox3.Text}',{textBox4.Text},{textBox5.Text},{textBox6.Text})", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO Customer(customerCompanyName, customerAddress, PSRN, ITN) VALUES( '{textBox2.Text}', '{textBox3.Text}',{textBox4.Text},{textBox5.Text},{textBox6.Text})", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не добавились!", "Ошибка ввода!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                db.closeConnection();
+            }
         }
         private void DeleteTable2()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"DELETE FROM Customer WHERE CustomerID = {id_selected_rows}", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"DELETE FROM Customer WHERE CustomerID = {id_selected_rows}", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не удалены!", "Строка не выбрана!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                db.closeConnection();
+            }
         }
         private void ProjectOrderTableReset()
         {
@@ -413,6 +488,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -420,6 +496,7 @@ namespace Autorization
             textBox5.Visible = true;
             textBox6.Visible = true;
             textBox7.Visible = true;
+
             Column1Label.Visible = false;
             Column2Label.Visible = true;
             Column3Label.Visible = true;
@@ -427,18 +504,21 @@ namespace Autorization
             Column5Label.Visible = true;
             Column6Label.Visible = true;
             Column7Label.Visible = true;
+
             AddLineButton.Visible = false;
             AddLineButton2.Visible = false;
             AddLineButton3.Visible = true;
             AddLineButton4.Visible = false;
             AddLineButton5.Visible = false;
             AddLineButton6.Visible = false;
+
             ResetButton.Visible = false;
             ResetButton2.Visible = false;
             ResetButton3.Visible = true;
             ResetButton4.Visible = false;
             ResetButton5.Visible = false;
             ResetButton6.Visible = false;
+
             DeleteLineButton.Visible = false;
             DeleteLineButton2.Visible = false;
             DeleteLineButton3.Visible = true;
@@ -463,6 +543,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -498,17 +579,33 @@ namespace Autorization
         }
         private void SupplemenEmloyee3()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"INSERT INTO ProjectOrder(projectName, projectCategory, projectPrice, ProjectID, EmployeesID, CustomerID) VALUES('{textBox2.Text}','{textBox3.Text}',{textBox4.Text}, '{textBox5.Text}', '{textBox6.Text}','{textBox7.Text}')", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO ProjectOrder(projectName, projectCategory, projectPrice, ProjectID, EmployeesID, CustomerID) VALUES('{textBox2.Text}','{textBox3.Text}',{textBox4.Text}, '{textBox5.Text}', '{textBox6.Text}','{textBox7.Text}')", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не добавились!", "Ошибка ввода!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                db.closeConnection();
+            }
         }
         private void DeleteTable3()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"DELETE FROM ProjectOrder WHERE ProjectOrderID = {id_selected_rows}", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"DELETE FROM ProjectOrder WHERE ProjectOrderID = {id_selected_rows}", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не удалены!", "Строка не выбрана!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                db.closeConnection();
+            }
         }
         private void ProjectIDTableReset()
         {
@@ -523,6 +620,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -530,6 +628,7 @@ namespace Autorization
             textBox5.Visible = false;
             textBox6.Visible = false;
             textBox7.Visible = false;
+
             Column1Label.Visible = false;
             Column2Label.Visible = true;
             Column3Label.Visible = true;
@@ -537,18 +636,21 @@ namespace Autorization
             Column5Label.Visible = false;
             Column6Label.Visible = false;
             Column7Label.Visible = false;
+
             AddLineButton.Visible = false;
             AddLineButton2.Visible = false;
             AddLineButton3.Visible = false;
             AddLineButton4.Visible = true;
             AddLineButton5.Visible = false;
             AddLineButton6.Visible = false;
+
             ResetButton.Visible = false;
             ResetButton2.Visible = false;
             ResetButton3.Visible = false;
             ResetButton4.Visible = true;
             ResetButton5.Visible = false;
             ResetButton6.Visible = false;
+
             DeleteLineButton.Visible = false;
             DeleteLineButton2.Visible = false;
             DeleteLineButton3.Visible = false;
@@ -569,6 +671,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -604,17 +707,33 @@ namespace Autorization
         }
         private void SupplemenEmloyee4()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"INSERT INTO ProjectSales(SaleID, datePurchase) VALUES('{textBox2.Text}', \"{textBox3.Text}\")", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO ProjectSales(SaleID, datePurchase) VALUES('{textBox2.Text}', \"{textBox3.Text}\")", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не добавились!", "Ошибка ввода!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                db.closeConnection();
+            }
         }
         private void DeleteTable4()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"DELETE FROM ProjectSales WHERE ProjectID = {id_selected_rows}", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"DELETE FROM ProjectSales WHERE ProjectID = {id_selected_rows}", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не удалены!", "Строка не выбрана!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                db.closeConnection();
+            }
         }
         private void SaleIDTableReset()
         {
@@ -630,6 +749,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -637,6 +757,7 @@ namespace Autorization
             textBox5.Visible = false;
             textBox6.Visible = false;
             textBox7.Visible = false;
+
             Column1Label.Visible = false;
             Column2Label.Visible = true;
             Column3Label.Visible = true;
@@ -644,18 +765,21 @@ namespace Autorization
             Column5Label.Visible = false;
             Column6Label.Visible = false;
             Column7Label.Visible = false;
+
             AddLineButton.Visible = false;
             AddLineButton2.Visible = false;
             AddLineButton3.Visible = false;
             AddLineButton4.Visible = false;
             AddLineButton5.Visible = true;
             AddLineButton6.Visible = false;
+
             ResetButton.Visible = false;
             ResetButton2.Visible = false;
             ResetButton3.Visible = false;
             ResetButton4.Visible = false;
             ResetButton5.Visible = true;
             ResetButton6.Visible = false;
+
             DeleteLineButton.Visible = false;
             DeleteLineButton2.Visible = false;
             DeleteLineButton3.Visible = false;
@@ -677,6 +801,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -712,17 +837,33 @@ namespace Autorization
         }
         private void SupplemenEmloyee5()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"INSERT INTO Sales(saleDate, saleNotes) VALUES( \"{textBox2.Text}\", {textBox3.Text}, {textBox4.Text})", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO Sales(saleDate, saleNotes) VALUES( \"{textBox2.Text}\", {textBox3.Text}, {textBox4.Text})", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не добавились!", "Ошибка ввода!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                db.closeConnection();
+            }
         }
         private void DeleteTable5()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"DELETE FROM Sales WHERE SaleID = {id_selected_rows}", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"DELETE FROM Sales WHERE SaleID = {id_selected_rows}", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не удалены!", "Строка не выбрана!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                db.closeConnection();
+            }
         }
         private void AutorizationIDTableReset()
         {
@@ -741,6 +882,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -748,6 +890,7 @@ namespace Autorization
             textBox5.Visible = true;
             textBox6.Visible = true;
             textBox7.Visible = true;
+
             Column1Label.Visible = false;
             Column2Label.Visible = true;
             Column3Label.Visible = true;
@@ -755,18 +898,21 @@ namespace Autorization
             Column5Label.Visible = true;
             Column6Label.Visible = true;
             Column7Label.Visible = true;
+
             AddLineButton.Visible = false;
             AddLineButton2.Visible = false;
             AddLineButton3.Visible = false;
             AddLineButton4.Visible = false;
             AddLineButton5.Visible = false;
             AddLineButton6.Visible = true;
+
             ResetButton.Visible = false;
             ResetButton2.Visible = false;
             ResetButton3.Visible = false;
             ResetButton4.Visible = false;
             ResetButton5.Visible = false;
             ResetButton6.Visible = true;
+
             DeleteLineButton.Visible = false;
             DeleteLineButton2.Visible = false;
             DeleteLineButton3.Visible = false;
@@ -791,6 +937,7 @@ namespace Autorization
             dataGridViewTransformData2.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
             dataGridViewTransformData2.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; // автосайз для столбца для гридера (растягивает столбец по ширине)
+
             textBox1.Visible = false; // сокрытие и показ всех необходимых элементов формы
             textBox2.Visible = true;
             textBox3.Visible = true;
@@ -826,29 +973,32 @@ namespace Autorization
         }
         private void SupplemenEmloyee6()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"INSERT INTO authorization(EmployeesID, employeesJobTitle, login, password, roleTitle, levelRole ) VALUES( '{textBox2.Text}', '{textBox3.Text}','{textBox4.Text}','{textBox5.Text}','{textBox6.Text}',{textBox7.Text})", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
-            db.closeConnection();
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO authorization(EmployeesID, employeesJobTitle, login, password, roleTitle, levelRole ) VALUES( '{textBox2.Text}', '{textBox3.Text}','{textBox4.Text}','{textBox5.Text}','{textBox6.Text}',{textBox7.Text})", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные добавились!" : "Данные не добавились!");
+                db.closeConnection();
+            }
+            catch
+            {
+                MessageBox.Show("Данные не добавились!", "Ошибка ввода!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                db.closeConnection();
+            }
         }
         private void DeleteTable6()
         {
-            db.openConnection();
-            MySqlCommand cmd = new MySqlCommand($"DELETE FROM authorization WHERE AuthorizationID = {id_selected_rows}", db.getConnection());
-            MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
-            db.closeConnection();
-        }
-        private void label4_Click(object sender, EventArgs e)
-        {
-            DialogResult res = new DialogResult();
-            res = MessageBox.Show("Вы действительно хотите выйти?", "Выход из программы", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (res == DialogResult.Yes)
-            { 
-                Application.Exit(); 
+            try
+            {
+                db.openConnection();
+                MySqlCommand cmd = new MySqlCommand($"DELETE FROM authorization WHERE AuthorizationID = {id_selected_rows}", db.getConnection());
+                MessageBox.Show(cmd.ExecuteNonQuery() > 0 ? "Данные удалены!" : "Данные не удалены!");
+                db.closeConnection();
             }
-            else
-            { 
-                return; 
+            catch
+            {
+                MessageBox.Show("Данные не удалены!", "Строка не выбрана!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                db.closeConnection();
             }
         }
         private void AddLineButton_Click(object sender, EventArgs e)
@@ -924,17 +1074,6 @@ namespace Autorization
             DeleteTable6();
         }
 
-
-
-
-        private void timer3_Tick(object sender, EventArgs e)
-        {
-            string dateandtime = DateTime.Now.ToString();
-            richTextBoxTime.Text = dateandtime;
-        }
-
-
-
         private void dataGridViewTransformData2_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (!e.RowIndex.Equals(-1) && !e.ColumnIndex.Equals(-1) && e.Button.Equals(MouseButtons.Right))
@@ -953,9 +1092,6 @@ namespace Autorization
             //Метод получения ID выделенной строки в глобальную переменную
             GetSelectedIDString();
         }
-
-
-        string id_selected_rows;
         public void GetSelectedIDString()
         {
             //Переменная для индекс выбранной строки в гриде
@@ -965,21 +1101,6 @@ namespace Autorization
             //ID конкретной записи в Базе данных, на основании индекса строки
             id_selected_rows = dataGridViewTransformData2.Rows[Convert.ToInt32(index_selected_rows)].Cells[0].Value.ToString();
             //Указываем ID выделенной строки в метке
-        }
-        private void ChangeDataForm_Load(object sender, EventArgs e)
-        {
-            ToolTip toolTip1 = new ToolTip(); // тул тип для подсказок
-            toolTip1.AutoPopDelay = 5000; // параметры показа подсказки, в течении какого времени будет видна подсказка
-            toolTip1.InitialDelay = 1000; // в течении какого кол-ва времени после наведения курсора будет показываться подсказка
-            toolTip1.ReshowDelay = 500; // возвращает или задает интервал времени, который должен пройти перед появлением окна очередной всплывающей подсказки при перемещении указателя мыши с одного элемента управления на другой.
-            toolTip1.ShowAlways = true; // статус видимости
-            toolTip1.SetToolTip(label4, "Закрытие программы");
-            ToolTip toolTip2 = new ToolTip(); // тул тип для подсказок
-            toolTip2.AutoPopDelay = 5000; // параметры показа подсказки, в течении какого времени будет видна подсказка
-            toolTip2.InitialDelay = 1000; // в течении какого кол-ва времени после наведения курсора будет показываться подсказка
-            toolTip2.ReshowDelay = 500; // возвращает или задает интервал времени, который должен пройти перед появлением окна очередной всплывающей подсказки при перемещении указателя мыши с одного элемента управления на другой.
-            toolTip2.ShowAlways = true; // статус видимости
-            toolTip2.SetToolTip(label2, "Коды (ID поля) не нужно заполнять, они заполняются автоматически! \n Даты пишутся в формате 2004-12-12\n Первое число - год, Второе - месяц, Третье - день.");
         }
     }
 }

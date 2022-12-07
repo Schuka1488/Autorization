@@ -14,6 +14,8 @@ namespace Autorization
 {
     public partial class LoginForm1 : Form 
     {
+        int dR, dG, dB, sign; // переменные для rgb и индекса таймера
+        Point lastPoint; // специальный класс для задачи координат
         static string sha256(string randomString)
         {
             //Тут происходит криптографическая магия. Смысл данного метода заключается в том, что строка залетает в метод
@@ -32,6 +34,15 @@ namespace Autorization
             animateComponent1.ShowForm(750);
             this.passwordName.AutoSize = false; // отключается авторазмер у пароля
         }
+        private void LoginForm1_Load(object sender, EventArgs e)
+        {
+            ToolTip toolTip1 = new ToolTip(); // тул тип для подсказок
+            toolTip1.AutoPopDelay = 5000; // параметры показа подсказки, в течении какого времени будет видна подсказка
+            toolTip1.InitialDelay = 100; // в течении какого кол-ва времени после наведения курсора будет показываться подсказка
+            toolTip1.ReshowDelay = 500; // возвращает или задает интервал времени, который должен пройти перед появлением окна очередной всплывающей подсказки при перемещении указателя мыши с одного элемента управления на другой.
+            toolTip1.ShowAlways = true; // статус видимости
+            toolTip1.SetToolTip(label4, "Закрытие программы");
+        }
         private void label4_Click(object sender, EventArgs e)
         {
             DialogResult res = new DialogResult();
@@ -46,7 +57,6 @@ namespace Autorization
             }
             animateComponent1.CloseForm(750);
         }
-        Point lastPoint; // специальный класс для задачи координат
         private void panel1_MouseMove(object sender, MouseEventArgs e)  //метод который создан для того, чтобы можно было перетаксивать форму, зажимая лкм на панели
         {
             if(e.Button == MouseButtons.Left)
@@ -70,6 +80,57 @@ namespace Autorization
         private void panel2_MouseDown(object sender, MouseEventArgs e) //метод который создан для того, чтобы можно было перетаксивать форму, зажимая лкм на панели
         {
             lastPoint = new Point(e.X, e.Y); // класс поинт создан для определении позиции в пространстве
+        }
+        private void WhiteThemeButton_Click(object sender, EventArgs e)
+        {
+            ThemeMethodClass.LightThemeMethodLoginForm(panel1, panel2, label2, label3, buttonLoginPass, loginName, passwordName, DarkThemeButton, WhiteThemeButton, labelTheme);
+            dR = labelTheme.BackColor.R - labelTheme.ForeColor.R;
+            dG = labelTheme.BackColor.G - labelTheme.ForeColor.G;
+            dB = labelTheme.BackColor.B - labelTheme.ForeColor.B;
+            sign = 2;
+            Timer timer = new Timer();
+            timer.Interval = 10;
+            timer.Tick += timer2_Tick;
+            timer.Start();
+        }
+
+        private void DarkThemeButton_Click(object sender, EventArgs e)
+        {
+            ThemeMethodClass.DarkThemeMethodLoginForm(panel1, panel2, label2, label3, buttonLoginPass, loginName, passwordName, DarkThemeButton, WhiteThemeButton, labelTheme);
+            dR = labelTheme.BackColor.R - labelTheme.ForeColor.R;
+            dG = labelTheme.BackColor.G - labelTheme.ForeColor.G;
+            dB = labelTheme.BackColor.B - labelTheme.ForeColor.B;
+            sign = 1;
+            Timer timer = new Timer();
+            timer.Interval = 10;
+            timer.Tick += timer1_Tick;
+            timer.Start();
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (Math.Abs(labelTheme.ForeColor.R - labelTheme.BackColor.R) < Math.Abs(dR / 10))
+            {
+                sign *= -1;
+                labelTheme.Text = "Темная тема вкл.";
+            }
+            labelTheme.ForeColor = Color.FromArgb(255, labelTheme.ForeColor.R + sign * dR / 10, labelTheme.ForeColor.G + sign * dG / 10, labelTheme.ForeColor.B + sign * dB / 10);
+            if (labelTheme.BackColor.R == labelTheme.ForeColor.R + dR)
+            {
+                ((Timer)sender).Stop();
+            }
+        }
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            if (Math.Abs(labelTheme.ForeColor.R - labelTheme.BackColor.R) < Math.Abs(dR / 10))
+            {
+                sign *= -1;
+                labelTheme.Text = "Светлая тема вкл.";
+            }
+            labelTheme.ForeColor = Color.FromArgb(255, labelTheme.ForeColor.R + sign * dR / 10, labelTheme.ForeColor.G + sign * dG / 10, labelTheme.ForeColor.B + sign * dB / 10);
+            if (labelTheme.BackColor.R == labelTheme.ForeColor.R + dR)
+            {
+                ((Timer)sender).Stop();
+            }
         }
         private void buttonLoginPass_Click(object sender, EventArgs e) // метод при помощи которого осуществляется авторизация и полноценные вход в приложение 
         {
@@ -118,71 +179,7 @@ namespace Autorization
             }
             else
             {
-                MessageBox.Show("Логин или пароль указан неверно."); // обработка исключения
-            }
-
-        }
-        private void WhiteThemeButton_Click(object sender, EventArgs e)
-        {
-            ThemeMethodClass.LightThemeMethodLoginForm(panel1, panel2, label2, label3, buttonLoginPass, loginName, passwordName, DarkThemeButton, WhiteThemeButton, labelTheme);
-            dR = labelTheme.BackColor.R - labelTheme.ForeColor.R;
-            dG = labelTheme.BackColor.G - labelTheme.ForeColor.G;
-            dB = labelTheme.BackColor.B - labelTheme.ForeColor.B;
-            sign = 2;
-            Timer timer = new Timer();
-            timer.Interval = 10;
-            timer.Tick += timer2_Tick;
-            timer.Start();
-        }
-
-        private void DarkThemeButton_Click(object sender, EventArgs e)
-        {
-            ThemeMethodClass.DarkThemeMethodLoginForm(panel1, panel2, label2, label3, buttonLoginPass, loginName, passwordName, DarkThemeButton, WhiteThemeButton, labelTheme);
-            dR = labelTheme.BackColor.R - labelTheme.ForeColor.R;
-            dG = labelTheme.BackColor.G - labelTheme.ForeColor.G;
-            dB = labelTheme.BackColor.B - labelTheme.ForeColor.B;
-            sign = 1;
-            Timer timer = new Timer();
-            timer.Interval = 10;
-            timer.Tick += timer1_Tick;
-            timer.Start();
-        }
-
-        private void LoginForm1_Load(object sender, EventArgs e)
-        {
-            ToolTip toolTip1 = new ToolTip(); // тул тип для подсказок
-            toolTip1.AutoPopDelay = 5000; // параметры показа подсказки, в течении какого времени будет видна подсказка
-            toolTip1.InitialDelay = 100; // в течении какого кол-ва времени после наведения курсора будет показываться подсказка
-            toolTip1.ReshowDelay = 500; // возвращает или задает интервал времени, который должен пройти перед появлением окна очередной всплывающей подсказки при перемещении указателя мыши с одного элемента управления на другой.
-            toolTip1.ShowAlways = true; // статус видимости
-            toolTip1.SetToolTip(label4, "Закрытие программы");
-        }
-
-        int dR, dG, dB, sign;
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            if (Math.Abs(labelTheme.ForeColor.R - labelTheme.BackColor.R) < Math.Abs(dR / 10))
-            {
-                sign *= -1;
-                labelTheme.Text = "Темная тема вкл.";
-            }
-            labelTheme.ForeColor = Color.FromArgb(255, labelTheme.ForeColor.R + sign * dR / 10, labelTheme.ForeColor.G + sign * dG / 10, labelTheme.ForeColor.B + sign * dB / 10);
-            if (labelTheme.BackColor.R == labelTheme.ForeColor.R + dR)
-            {
-                ((Timer)sender).Stop();
-            }
-        }
-        private void timer2_Tick(object sender, EventArgs e)
-        {
-            if (Math.Abs(labelTheme.ForeColor.R - labelTheme.BackColor.R) < Math.Abs(dR / 10))
-            {
-                sign *= -1;
-                labelTheme.Text = "Светлая тема вкл.";
-            }
-            labelTheme.ForeColor = Color.FromArgb(255, labelTheme.ForeColor.R + sign * dR / 10, labelTheme.ForeColor.G + sign * dG / 10, labelTheme.ForeColor.B + sign * dB / 10);
-            if (labelTheme.BackColor.R == labelTheme.ForeColor.R + dR)
-            {
-                ((Timer)sender).Stop();
+                MessageBox.Show("Логин или пароль указан неверно.","Ошибка входа", MessageBoxButtons.OK,MessageBoxIcon.Error); // обработка исключения
             }
         }
     }
